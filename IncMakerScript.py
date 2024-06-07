@@ -181,14 +181,14 @@ if sheet["A2"].value != None:
                         print ("Snow failed, run script again...")
                         print("The EID exists? check and run again")
                     time.sleep(2)
-                    try:
-                        WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[9]/div/div/header/button')))
-                        exitEmerWindow = driver.find_element(By.XPATH, '/html/body/div[9]/div/div/header/button')
-                        exitEmerWindow.click()
+                    # try:
+                    #     WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[9]/div/div/header/button')))
+                    #     exitEmerWindow = driver.find_element(By.XPATH, '/html/body/div[9]/div/div/header/button')
+                    #     exitEmerWindow.click()
 
-                    except TimeoutException:
-                        print ("Snow failed, run script again...")
-                    time.sleep(3)
+                    # except TimeoutException:
+                    #     print ("Snow failed, run script again...")
+                    # time.sleep(3)
 
                     try:                                                                                #
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[7]/div/div/div/rendered_body/div/div/span/div/div[5]/div[1]/table/tbody/tr/td[3]/a')))
@@ -329,7 +329,8 @@ if sheet["A2"].value != None:
                         iframe = shadow_section.find_element(By.TAG_NAME, 'iframe')
                         driver.switch_to.frame (iframe)
                         time.sleep(1)
-    
+
+                        
                         partFixed = [2, 3, 4, 7, 8, 9, 11]
                         if  (resolutionRoot == 3) and (subResolutionToConc in partFixed):
                             #CICLO 3
@@ -410,6 +411,7 @@ if sheet["A2"].value != None:
 
         else:
             print("TICKETS HAVE BEEN CREATED")
+            break
 else:
     print("NO TICKETS TO CREATE. ADD TICKETS TO THE EXCEL FILE")
 
