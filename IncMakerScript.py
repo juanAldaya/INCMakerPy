@@ -21,10 +21,14 @@ driver = webdriver.Edge(options = option)
 timeOut = 55
 workbook = load_workbook(filename = "PythonINCMaker.xlsx")
 sheet = workbook.active
+maxRow = sheet.max_row
+
+
+
 
 if sheet["A2"].value != None:
     
-    for row in sheet.iter_rows(min_row=2, min_col=1, max_row=1000, max_col=1):
+    for row in sheet.iter_rows(min_row=2, min_col=1, max_row=maxRow, max_col=1):
 
         driver.get("https://support.accenture.com/now/nav/ui/classic/params/target/incident.do%3Fsys_id%3D-1%26sysparm_query%3Dactive%3Dtrue%26sysparm_stack%3Dincident_list.do%3Fsysparm_query%3Dactive%3Dtrue")     
         WebDriverWait(driver, timeOut).until(EC.title_contains(" | Incident | ServiceNow"))
@@ -54,12 +58,13 @@ if sheet["A2"].value != None:
                         expandClassificationsButton.click()
                     except TimeoutException:
                         print ("Snow failed, run script again...")
-                    time.sleep(1)
+                    time.sleep(5)
 
                     ########## edge window switch
                     original_window = driver.current_window_handle  #
                     incTypesWindow = driver.window_handles[1] ## from window 0 to window 1 in the windows list. 
                     driver.switch_to.window(incTypesWindow)   ## 
+                    time.sleep(0.75)
                     ########## 
                     try: #CLASSIFY ROOT
                         cellRow = str(cell.row)  
@@ -69,7 +74,7 @@ if sheet["A2"].value != None:
                         classRootButton = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[3]/div/div/div/div/div['+classRooToConc+']/table')
                         classRootButton.click()
 
-                    except TimeoutException:
+                    except TimeoutException: 
                         print ("Snow failed, run script again...")
 
                     ########## ########## 
@@ -78,7 +83,7 @@ if sheet["A2"].value != None:
                     iframe = shadow_section.find_element(By.TAG_NAME, 'iframe')
                     driver.switch_to.frame (iframe)
                     ########## 
-
+                    time.sleep(0.75)
                     try: #CLASS BUTTON OPEN THE CLASSIFICATION WINDOW
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[8]/div[2]/div[2]/span[2]/button')))
                         expandClassificationsButton = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[8]/div[2]/div[2]/span[2]/button')
@@ -90,6 +95,7 @@ if sheet["A2"].value != None:
                     incTypesWindow = driver.window_handles[1]
                     driver.switch_to.window(incTypesWindow)
                     ########## 
+                    time.sleep(2)
                     try: #SUB CLASSIFY
                         cellRow = str(cell.row)
                         subClass = sheet["d"+cellRow].value
@@ -105,10 +111,10 @@ if sheet["A2"].value != None:
                     shadow_section = driver.execute_script('''return document.querySelector("body > macroponent-f51912f4c700201072b211d4d8c26010").shadowRoot.querySelector("div > sn-canvas-appshell-root > sn-canvas-appshell-layout")''')
                     iframe = shadow_section.find_element(By.TAG_NAME, 'iframe')
                     driver.switch_to.frame (iframe)
-                    time.sleep(1)
+                    time.sleep(1.5)
                     ########## ########## 
 
-
+                    
                     if classRooToConc == '1': #sw class will get the app from the excel. 
                         try:
                             WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[12]/div[2]/div[2]/input')))
@@ -116,8 +122,7 @@ if sheet["A2"].value != None:
                             appAffected.send_keys(sheet['g'+str(cell.row)].value)
                         except TimeoutException:
                             print ("Snow failed, run script again...")
-
-                    elif classRooToConc == '8' and subClassToConc == '14' : #compliance class will get the cmplnc item from the excel
+                    elif classRooToConc == '8' and subClassToConc == '16' : #compliance class will get the cmplnc item from the excel
                         try: 
                             WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[9]/div[2]/div[2]/input')))
                             itemUncompliance = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[9]/div[2]/div[2]/input')
@@ -135,7 +140,7 @@ if sheet["A2"].value != None:
                         except TimeoutException:
                             print ("Snow failed, run script again...")
 
-
+                    
                     else:  
                         try:# any else just pick laptop
                             WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[9]/div[2]/div[2]/input')))
@@ -144,20 +149,22 @@ if sheet["A2"].value != None:
                         except TimeoutException:
                             print ("Snow failed, run script again...")
 
-
+                    time.sleep(0.75)
                     try: #always support team
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[6]/div[2]/select')))
                         channelButton = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[6]/div[2]/select')
                         channelButton.click()
                     except TimeoutException:
                         print ("Snow failed, run script again...")
+
+                    
                     try:
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[6]/div[2]/select/option[6]')))
                         channelOption = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[6]/div[2]/select/option[6]')
                         channelOption.click()
                     except TimeoutException:
                         print ("Snow failed, run script again...")
-
+                    time.sleep(1)
                     try: #the owner group from the excel row 'l'
                         cellRow = str(cell.row)
                         ownerGroup = sheet["l"+cellRow].value
@@ -170,9 +177,9 @@ if sheet["A2"].value != None:
                     except TimeoutException:
                         print ("Snow failed, run script again...")
 
-                    #time.sleep(5)
+                    time.sleep(1.5)
                     
-                    
+
                     try: #/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[11]/div[2]/div[2]/span[2]/button
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[3]/div[3]/a[2]')))
                         assetButton = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[3]/div[3]/a[2]')
@@ -188,7 +195,7 @@ if sheet["A2"].value != None:
 
                     # except TimeoutException:
                     #     print ("Snow failed, run script again...")
-                    # time.sleep(3)
+                    # time.sleep(0.75)
 
                     try:                                                                                #
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[7]/div/div/div/rendered_body/div/div/span/div/div[5]/div[1]/table/tbody/tr/td[3]/a')))
@@ -202,7 +209,7 @@ if sheet["A2"].value != None:
                         exitAssets.click()
                     except TimeoutException:
                         print ("Snow failed, run script again...")
-
+                    # time.sleep(0.75)
                     if machineName[:3] == 'CPX' or machineName[:3] == 'C11' or machineName[:3] == 'BA5':
                         try:#this step open the assets assigned to the user and pick the first one that always is the most recently logged
                             WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[1]/div[11]/div[2]/div[2]/input')))
@@ -217,7 +224,7 @@ if sheet["A2"].value != None:
                             affectedCi.send_keys("Laptop")
                         except TimeoutException:
                             print ("Snow failed, run script again...")
-
+                    # time.sleep(0.75)
                     try: #LTS member to assign the incident
                         cellRow = str(cell.row)
                         assignedTo = sheet["b"+cellRow].value
@@ -226,7 +233,7 @@ if sheet["A2"].value != None:
                         assignedToField.send_keys(assignedTo)
                     except TimeoutException:
                         print ("Snow failed, run script again...")
-
+                    time.sleep(0.75)
                     try: #short description
                         cellRow = str(cell.row)
                         shortDesc = sheet["e"+cellRow].value
@@ -235,7 +242,7 @@ if sheet["A2"].value != None:
                         shortDescField.send_keys(shortDesc)
                     except TimeoutException:
                         print ("Snow failed, run script again...")
-
+                    time.sleep(0.75)
                     try: #add full desc from column 'f'
                         cellRow = str(cell.row)
                         fullDesc = sheet["f"+cellRow].value
@@ -244,7 +251,7 @@ if sheet["A2"].value != None:
                         fullDescField.send_keys(fullDesc)
                     except TimeoutException:
                         print ("Snow failed, run script again...")
-
+                    time.sleep(0.75)
                         
                     try: #ticket state 
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[7]/div[2]/select')))
@@ -252,7 +259,7 @@ if sheet["A2"].value != None:
                         stateButton.click()
                     except TimeoutException:
                         print ("Snow failed, run script again...")
-
+                    time.sleep(0.75)
                     try:#WORK IN PROGRESS ALWAYS BEFORE  
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[7]/div[2]/select/option[3]')))
                         stateButton = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[7]/div[2]/select/option[3]')
@@ -264,7 +271,8 @@ if sheet["A2"].value != None:
                     stateOptionToConc = sheet['h'+str(cell.row)].value ## retrieve the state of the ticket to know if the ticket is resolved       
 
                     if (stateOptionToConc == 10): #if the ticket is resolved, then enter to the resolution phase            
-                        try:   
+                        try:
+                            time.sleep(0.75)
                             WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[7]/div[2]/select/option['+str(stateOptionToConc)+']')))
                             stateButton = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[7]/div[2]/select/option['+str(stateOptionToConc)+']')
                             stateButton.click()
@@ -275,7 +283,7 @@ if sheet["A2"].value != None:
                         driver.execute_script("window.scrollTo(5,document.body.scrollHeight)")
 
                         try: #RESOLUTION FIELD 
-                            
+                            time.sleep(0.75)        
                             WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[5]/span/div/div[1]/div[1]/div[2]/div[2]/div[2]/span[2]/button')))
                             resolutionButton = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[5]/span/div/div[1]/div[1]/div[2]/div[2]/div[2]/span[2]/button')
                             resolutionButton.click()
@@ -285,6 +293,7 @@ if sheet["A2"].value != None:
                         original_window = driver.current_window_handle 
                         incTypesWindow = driver.window_handles[1]
                         driver.switch_to.window(incTypesWindow)
+                        time.sleep(0.75)
 
                         try: #RESOLUTION ROOT
                             resolutionRoot = sheet['i'+str(cell.row)].value
@@ -299,7 +308,7 @@ if sheet["A2"].value != None:
                         shadow_section = driver.execute_script('''return document.querySelector("body > macroponent-f51912f4c700201072b211d4d8c26010").shadowRoot.querySelector("div > sn-canvas-appshell-root > sn-canvas-appshell-layout")''')
                         iframe = shadow_section.find_element(By.TAG_NAME, 'iframe')
                         driver.switch_to.frame (iframe)
-                        time.sleep(2)
+                        time.sleep(1)
 
                         try: #sUB RESOLUTION FIELD
                             
@@ -323,7 +332,7 @@ if sheet["A2"].value != None:
                             subResolution.click()                                                
                         except TimeoutException:
                             print ("Snow failed, run script again...") 
-                        
+                            
                         driver.switch_to.window(original_window)
                         shadow_section = driver.execute_script('''return document.querySelector("body > macroponent-f51912f4c700201072b211d4d8c26010").shadowRoot.querySelector("div > sn-canvas-appshell-root > sn-canvas-appshell-layout")''')
                         iframe = shadow_section.find_element(By.TAG_NAME, 'iframe')
@@ -345,7 +354,7 @@ if sheet["A2"].value != None:
                             original_window = driver.current_window_handle #PASA ALA VENTANA 3ER CICLO
                             incTypesWindow = driver.window_handles[1]
                             driver.switch_to.window(incTypesWindow)
-                            time.sleep(3)
+                            time.sleep(1)
 
 
                             try: #PART FIXED FIELD
@@ -360,7 +369,7 @@ if sheet["A2"].value != None:
                             shadow_section = driver.execute_script('''return document.querySelector("body > macroponent-f51912f4c700201072b211d4d8c26010").shadowRoot.querySelector("div > sn-canvas-appshell-root > sn-canvas-appshell-layout")''')
                             iframe = shadow_section.find_element(By.TAG_NAME, 'iframe')
                             driver.switch_to.frame (iframe)
-                            time.sleep(3)
+                            time.sleep(1)
 
                         try: #CLOSE CODE
                                 WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[5]/span/div/div[1]/div[1]/div[8]/div[2]/select')))
@@ -368,7 +377,7 @@ if sheet["A2"].value != None:
                                 closeCodeButton.click()
                         except TimeoutException:
                                 print ("Snow failed, run script again...")
-
+                        time.sleep(0.75)   
                         try: #CLOSE CODE SOLVED PERMANENTLY
                                 WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[5]/span/div/div[1]/div[1]/div[8]/div[2]/select/option[3]')))
                                 closeCodeButton = driver.find_element(By.XPATH, '/html/body/div[2]/form/span[5]/span/div/div[1]/div[1]/div[8]/div[2]/select/option[3]')
@@ -377,7 +386,7 @@ if sheet["A2"].value != None:
                                 print ("Snow failed, run script again...")
 
 
-
+                        time.sleep(0.75)
                         try: #CLOSE NOTES
                                 closeNotes =  sheet['n'+str(cell.row)].value
                                 WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[5]/span/div/div[2]/div/div/div[2]/textarea')))
@@ -385,7 +394,7 @@ if sheet["A2"].value != None:
                                 closeCodeArea.send_keys(closeNotes)
                         except TimeoutException:
                                 print ("Snow failed, run script again...")            
-                        
+                            
                     else:
                         try:   
                             WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/form/span[1]/span/div[5]/div[1]/div[2]/div[7]/div[2]/select/option['+str(stateOptionToConc)+']')))
@@ -393,6 +402,8 @@ if sheet["A2"].value != None:
                             stateButton.click()
                         except TimeoutException:
                             print ("Snow failed, run script again...") 
+
+                    time.sleep(0.75)       
                     try:
                         WebDriverWait(driver, timeOut).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/span/span/nav/div/div[2]/span[1]/span[2]/span/button[1]')))
                         submitButton = driver.find_element(By.XPATH, '/html/body/div[1]/span/span/nav/div/div[2]/span[1]/span[2]/span/button[1]')
@@ -400,7 +411,7 @@ if sheet["A2"].value != None:
                     except TimeoutException:
                         print ("Snow failed, run script again...")
 
-            
+                time.sleep(10)
                 cellRow = str(cell.row + 1)
                 if sheet["A"+ cellRow] != None:
                     driver.switch_to.new_window("tab")
